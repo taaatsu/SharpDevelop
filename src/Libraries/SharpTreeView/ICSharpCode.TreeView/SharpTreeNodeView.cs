@@ -54,7 +54,9 @@ namespace ICSharpCode.TreeView
 		}
 
 		public SharpTreeViewItem ParentItem { get; private set; }
-		
+
+
+		/*
 		public static readonly DependencyProperty CellEditorProperty =
 			DependencyProperty.Register("CellEditor", typeof(Control), typeof(SharpTreeNodeView),
 			                            new FrameworkPropertyMetadata());
@@ -63,11 +65,29 @@ namespace ICSharpCode.TreeView
 			get { return (Control)GetValue(CellEditorProperty); }
 			set { SetValue(CellEditorProperty, value); }
 		}
+        */
 
-		public SharpTreeView ParentTreeView
+
+        // Controlよりも一般的なFrameworkElementを対象とするよう変更
+        public static readonly DependencyProperty CellEditorProperty =
+            DependencyProperty.Register("CellEditor", typeof(FrameworkElement), typeof(SharpTreeNodeView),
+                                        new FrameworkPropertyMetadata());
+        public FrameworkElement CellEditor
+        {
+            get { return (FrameworkElement)GetValue(CellEditorProperty); }
+            set { SetValue(CellEditorProperty, value); }
+        }
+
+
+
+        public SharpTreeView ParentTreeView
 		{
 			get { return ParentItem.ParentTreeView; }
 		}
+
+
+
+
 
 		internal LinesRenderer LinesRenderer { get; private set; }
 
@@ -82,7 +102,14 @@ namespace ICSharpCode.TreeView
 		{
 			base.OnVisualParentChanged(oldParent);
 			ParentItem = this.FindAncestor<SharpTreeViewItem>();
-			ParentItem.NodeView = this;
+            if (ParentItem != null)
+            {
+                ParentItem.NodeView = this;
+            }
+            else
+            {
+                System.Diagnostics.Debug.Print("SharpTreeNodeViewのVisualTree先祖にSharpTreeViewItemクラスが見つかりません。");
+            }
 		}
 
 		protected override void OnPropertyChanged(DependencyPropertyChangedEventArgs e)

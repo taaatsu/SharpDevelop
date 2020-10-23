@@ -57,8 +57,11 @@ namespace ICSharpCode.TreeView
 					if (Node.IsEditing) {
 						Node.IsEditing = false;
 						e.Handled = true;
-					}
-					break;
+
+                        //JumonEdited:Editで使用されたWPFエレメントによっては、キーボードフォーカスが失われることがあるため、意図的に追加
+                        Keyboard.Focus(this);
+                    }
+                    break;
 			}
 		}
 
@@ -78,11 +81,13 @@ namespace ICSharpCode.TreeView
 			if (Mouse.LeftButton == MouseButtonState.Pressed) {
 				startPoint = e.GetPosition(null);
 				CaptureMouse();
+                System.Diagnostics.Debug.WriteLine("OnMouseLeftButtonDown:マウスキャプチャー");
 
-				if (e.ClickCount == 2) {
+                if (e.ClickCount == 2) {
 					wasDoubleClick = true;
-				}
-			}
+                    System.Diagnostics.Debug.WriteLine("OnMouseLeftButtonDown:Itemのダブルクリック");
+                }
+            }
 		}
 
 		protected override void OnMouseMove(MouseEventArgs e)
@@ -101,7 +106,8 @@ namespace ICSharpCode.TreeView
 		protected override void OnMouseLeftButtonUp(MouseButtonEventArgs e)
 		{
 			if (wasDoubleClick) {
-				wasDoubleClick = false;
+                System.Diagnostics.Debug.WriteLine("OnMouseLeftButtonUp:Itemのダブルクリック処理");
+                wasDoubleClick = false;
 				Node.ActivateItem(e);
 				if (!e.Handled) {
 					if (!Node.IsRoot || ParentTreeView.ShowRootExpander) {
@@ -111,9 +117,11 @@ namespace ICSharpCode.TreeView
 			}
 			
 			ReleaseMouseCapture();
-			if (wasSelected) {
-				base.OnMouseLeftButtonDown(e);
-			}
+            System.Diagnostics.Debug.WriteLine("OnMouseLeftButtonUp:マウスキャプチャー解除 wasSelected={0}", wasSelected);
+            //JumonEdited:wasSelectedによる再選択処理はうまく機能してないので削除
+            //if (wasSelected) {
+			//	base.OnMouseLeftButtonDown(e);
+			//}
 		}
 
 		protected override void OnContextMenuOpening(ContextMenuEventArgs e)
